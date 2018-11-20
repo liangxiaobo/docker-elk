@@ -3,7 +3,7 @@ version: '3.3'
 services:
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.4.0
+    image: 172.16.10.192:5000/elasticsearch:6.5.0
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -19,7 +19,7 @@ services:
       replicas: 1
 
   logstash:
-    image: docker.elastic.co/logstash/logstash-oss:6.4.0
+    image: 172.16.10.192:5000/logstash:6.5.0
     ports:
       - "5000:5000"
       - "9600:9600"
@@ -31,13 +31,31 @@ services:
     environment:
       LS_JAVA_OPTS: "-Xmx256m -Xms256m"
     networks:
-      - elk
+     - elk
     deploy:
       mode: replicated
       replicas: 1
+  
+  logspout:
+    image: bekt/logspout-logstash
+    environmernt:
+      ROUTE_URIS: 'logstash+tcp://logstash:5000'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock 
+    depends_on:
+      - logstash
+    networks:
+      - elk
+
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+
 
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:6.4.0
+    image: 172.16.10.192:5000/kibana:6.5.0
     ports:
       - "5601:5601"
     configs:

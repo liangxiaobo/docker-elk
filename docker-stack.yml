@@ -38,7 +38,7 @@ services:
   
   logspout:
     image: bekt/logspout-logstash
-    environmernt:
+    environment:
       ROUTE_URIS: 'logstash+tcp://logstash:5000'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock 
